@@ -1,6 +1,6 @@
-
 import 'dart:math';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_store_app/widgets/repeated_button_widget.dart';
@@ -27,6 +27,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool processing = false;
+  CollectionReference customers =
+      FirebaseFirestore.instance.collection("customers");
+  late String _uid;
 
   @override
   void initState() {
@@ -53,7 +56,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         constraints: const BoxConstraints.expand(),
         child: SafeArea(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               AnimatedTextKit(
                 animatedTexts: [
@@ -148,7 +151,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               label: 'Log In',
                               onPressed: () {
                                 Navigator.pushReplacementNamed(
-                                    context, '/supplier_home');
+                                    context, '/supplierLogin_screen');
                               },
                               width: 0.25,
                             ),
@@ -156,7 +159,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               padding: const EdgeInsets.only(right: 8),
                               child: RepeatedButton(
                                 label: 'Sign Up',
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushReplacementNamed(
+                                      context, '/supplierSignup_screen');
+                                },
                                 width: 0.25,
                               ),
                             )
@@ -187,7 +193,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             label: 'Log In',
                             onPressed: () {
                               Navigator.pushReplacementNamed(
-                                  context, '/customer_home');
+                                  context, '/customerLogin_screen');
                             },
                             width: 0.25,
                           ),
@@ -226,21 +232,37 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         child: const Image(
                             image: AssetImage('images/inapp/facebook.jpg')),
                       ),
-                      processing == true? const CircularProgressIndicator(): SocialMediaButtons(
-                        onPressed: ()async {
-                          await FirebaseAuth.instance.signInAnonymously();
-                          setState(() {
-                            processing = true;
-                          });
-                          Navigator.pushReplacementNamed(context, '/customer_home');
-                        },
-                        label: 'Guest',
-                        child: const Icon(
-                          Icons.person,
-                          size: 55,
-                          color: Colors.lightBlueAccent,
-                        ),
-                      )
+                      processing == true
+                          ? const CircularProgressIndicator()
+                          : SocialMediaButtons(
+                              onPressed: () async {
+                                await FirebaseAuth.instance
+                                    .signInAnonymously()
+                                    .whenComplete(() async {
+                                  _uid = FirebaseAuth.instance.currentUser!.uid;
+                                  await customers.doc(_uid).set({
+                                    'name': '',
+                                    'email': '',
+                                    'profileimage': '',
+                                    'phone': '',
+                                    'address': '',
+                                    'cid': _uid,
+                                  });
+                                });
+
+                                setState(() {
+                                  processing = true;
+                                });
+                                Navigator.pushReplacementNamed(
+                                    context, '/customer_home');
+                              },
+                              label: 'Guest',
+                              child: const Icon(
+                                Icons.person,
+                                size: 55,
+                                color: Colors.lightBlueAccent,
+                              ),
+                            )
                     ],
                   ),
                 ),

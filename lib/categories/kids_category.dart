@@ -29,7 +29,7 @@ class KidsCategory extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.60,
                     child: GridView.count(
                       mainAxisSpacing: 70,
-                      crossAxisSpacing: 15,
+                      crossAxisSpacing: 14,
                       crossAxisCount: 3,
                       children: List.generate(kids.length, (index) {
                         return SubCategoryModel(
