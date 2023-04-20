@@ -1,8 +1,8 @@
-import 'dart:html';
+
 import 'dart:math';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:multi_store_app/main_Screens/supplier_home.dart';
 import 'package:multi_store_app/widgets/repeated_button_widget.dart';
 
 const textColor = [
@@ -26,6 +26,7 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  bool processing = false;
 
   @override
   void initState() {
@@ -147,7 +148,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               label: 'Log In',
                               onPressed: () {
                                 Navigator.pushReplacementNamed(
-                                    context, '/supplierHome_screen');
+                                    context, '/supplier_home');
                               },
                               width: 0.25,
                             ),
@@ -186,7 +187,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             label: 'Log In',
                             onPressed: () {
                               Navigator.pushReplacementNamed(
-                                  context, '/customerHome_screen');
+                                  context, '/customer_home');
                             },
                             width: 0.25,
                           ),
@@ -225,8 +226,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         child: const Image(
                             image: AssetImage('images/inapp/facebook.jpg')),
                       ),
-                      SocialMediaButtons(
-                        onPressed: () {},
+                      processing == true? const CircularProgressIndicator(): SocialMediaButtons(
+                        onPressed: ()async {
+                          await FirebaseAuth.instance.signInAnonymously();
+                          setState(() {
+                            processing = true;
+                          });
+                          Navigator.pushReplacementNamed(context, '/customer_home');
+                        },
                         label: 'Guest',
                         child: const Icon(
                           Icons.person,
