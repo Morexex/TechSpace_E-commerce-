@@ -4,37 +4,23 @@ import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
 
 import '../models/product_model.dart';
-import '../widgets/appbar_widgets.dart';
 
-class SubcategProducts extends StatefulWidget {
-  
-  
-  final String mainCategName;
-  final String subCategName;
-  const SubcategProducts(
-      {super.key, required this.subCategName, required this.mainCategName});
+class AccessoriesGalleryScreen extends StatefulWidget {
+  const AccessoriesGalleryScreen({super.key});
 
   @override
-  State<SubcategProducts> createState() => _SubcategProductsState();
+  State<AccessoriesGalleryScreen> createState() => _AccessoriesGalleryScreenState();
 }
 
-class _SubcategProductsState extends State<SubcategProducts> {
-  
+class _AccessoriesGalleryScreenState extends State<AccessoriesGalleryScreen> {
+  final Stream<QuerySnapshot> _productsStream = FirebaseFirestore.instance
+      .collection('products')
+      .where('maincateg', isEqualTo: 'accessories')
+      .snapshots();
+
   @override
   Widget build(BuildContext context) {
-    final Stream<QuerySnapshot> _productsStream = FirebaseFirestore.instance
-      .collection('products')
-      .where('maincateg', isEqualTo: widget.mainCategName).where('subcateg', isEqualTo: widget.subCategName)
-      .snapshots();
-    return Scaffold(
-      backgroundColor: Colors.grey.shade200,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: const AppBarBackButton(),
-        title: AppBarTitle(title: widget.subCategName),
-      ),
-      body: StreamBuilder<QuerySnapshot>(
+    return StreamBuilder<QuerySnapshot>(
       stream: _productsStream,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -75,19 +61,8 @@ class _SubcategProductsState extends State<SubcategProducts> {
             staggeredTileBuilder: (context) => const StaggeredTile.fit(1),
           ),
         );
-
-        /* ListView(
-          children: snapshot.data!.docs.map((DocumentSnapshot document) {
-          Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-            return ListTile(
-              leading: Image(image: NetworkImage(data['proimages'][0])),
-              title: Text(data['proname']),
-              subtitle: Text(data['price'].toString()),
-            );
-          }).toList(),
-        ); */
       },
-    ),
     );
   }
 }
+

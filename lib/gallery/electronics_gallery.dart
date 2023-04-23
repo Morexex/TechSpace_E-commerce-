@@ -4,37 +4,23 @@ import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
 
 import '../models/product_model.dart';
-import '../widgets/appbar_widgets.dart';
 
-class SubcategProducts extends StatefulWidget {
-  
-  
-  final String mainCategName;
-  final String subCategName;
-  const SubcategProducts(
-      {super.key, required this.subCategName, required this.mainCategName});
+class ElectronicGalleryScreen extends StatefulWidget {
+  const ElectronicGalleryScreen({super.key});
 
   @override
-  State<SubcategProducts> createState() => _SubcategProductsState();
+  State<ElectronicGalleryScreen> createState() => _ElectronicGalleryScreenState();
 }
 
-class _SubcategProductsState extends State<SubcategProducts> {
-  
+class _ElectronicGalleryScreenState extends State<ElectronicGalleryScreen> {
+  final Stream<QuerySnapshot> _productsStream = FirebaseFirestore.instance
+      .collection('products')
+      .where('maincateg', isEqualTo: 'electronics')
+      .snapshots();
+
   @override
   Widget build(BuildContext context) {
-    final Stream<QuerySnapshot> _productsStream = FirebaseFirestore.instance
-      .collection('products')
-      .where('maincateg', isEqualTo: widget.mainCategName).where('subcateg', isEqualTo: widget.subCategName)
-      .snapshots();
-    return Scaffold(
-      backgroundColor: Colors.grey.shade200,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: const AppBarBackButton(),
-        title: AppBarTitle(title: widget.subCategName),
-      ),
-      body: StreamBuilder<QuerySnapshot>(
+    return StreamBuilder<QuerySnapshot>(
       stream: _productsStream,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -87,7 +73,7 @@ class _SubcategProductsState extends State<SubcategProducts> {
           }).toList(),
         ); */
       },
-    ),
     );
   }
 }
+

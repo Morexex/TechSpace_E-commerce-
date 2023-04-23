@@ -283,7 +283,7 @@ class _CustomerRegisterScreenState extends State<SupplierRegisterScreen> {
                         actionLabel: 'Log In',
                         onPressed: () {
                           Navigator.pushReplacementNamed(
-                              context, '/customerLogin_screen');
+                              context, '/supplierLogin_screen');
                         },
                       ),
                       processing == true

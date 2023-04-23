@@ -139,7 +139,7 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
                         actionLabel: 'Sign Up',
                         onPressed: () {
                           Navigator.pushReplacementNamed(
-                              context, '/customerSignup_screen');
+                              context, '/supplierSignup_screen');
                         },
                       ),
                       processing == true

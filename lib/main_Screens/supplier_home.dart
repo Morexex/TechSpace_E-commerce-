@@ -3,6 +3,7 @@ import 'package:multi_store_app/main_Screens/category.dart';
 import 'package:multi_store_app/main_Screens/dashboard.dart';
 import 'package:multi_store_app/main_Screens/home.dart';
 import 'package:multi_store_app/main_Screens/stores.dart';
+import 'package:multi_store_app/main_Screens/upload_product.dart';
 
 class SupplierHomeScreen extends StatefulWidget {
   const SupplierHomeScreen({super.key});
@@ -18,9 +19,7 @@ class _SupplierHomeScreenState extends State<SupplierHomeScreen> {
     CategoryScreen(),
     StoresScreen(),
     DashBoardScreen(),
-    Center(
-      child: Text('Upload'),
-    ),
+    UploadProductScreen()
   ];
   @override
   Widget build(BuildContext context) {
