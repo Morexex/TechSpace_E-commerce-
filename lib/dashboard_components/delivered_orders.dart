@@ -1,28 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:multi_store_app/widgets/appbar_widgets.dart';
-
-import '../models/customer_order_model.dart';
-
-class CustomerOrdersScreen extends StatelessWidget {
-  const CustomerOrdersScreen({super.key});
+import '../models/supplier_order_model.dart';
+class Delivered extends StatelessWidget {
+  const Delivered({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const AppBarTitle(
-          title: 'Orders',
-        ),
-        leading: const AppBarBackButton(),
-      ),
-      body: StreamBuilder<QuerySnapshot>(
+    return StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('orders')
-              .where('cid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+              .where('sid', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+              .where('deliverystatus',isEqualTo: 'delivered')
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -54,12 +43,10 @@ class CustomerOrdersScreen extends StatelessWidget {
             return ListView.builder(
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
-                  return CustomerOrderModel(
+                  return SupplierOrderModel(
                     order: snapshot.data!.docs[index],
                   );
                 });
-          }),
-    );
+          });
   }
 }
-
