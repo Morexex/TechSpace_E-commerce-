@@ -20,7 +20,7 @@ class RepeatedButton extends StatelessWidget {
             color: Colors.purple, borderRadius: BorderRadius.circular(25)),
         child: MaterialButton(
           onPressed: onPressed,
-          child: Text(label),
+          child: Text(label,style: const TextStyle(color: Colors.white),),
         ));
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:multi_store_app/widgets/alert_dialogue.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 import 'package:provider/provider.dart';
+import '../minor_screens/placeorder_screen.dart';
 import '../models/cart_model.dart';
 import '../providers/cart_provider.dart';
 import '../widgets/repeated_button_widget.dart';
@@ -17,6 +18,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
+    late double total = context.watch<Cart>().totalPrice;
     return Material(
       child: SafeArea(
         child: Scaffold(
@@ -64,7 +66,7 @@ class _CartScreenState extends State<CartScreen> {
                       style: TextStyle(fontSize: 18),
                     ),
                     Text(
-                      context.watch<Cart>().totalPrice.toStringAsFixed(2),
+                      total.toStringAsFixed(2),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -74,10 +76,26 @@ class _CartScreenState extends State<CartScreen> {
                   ],
                 ),
               ),
-              RepeatedButton(
-                width: 0.45,
-                label: 'CHECK OUT',
-                onPressed: () {},
+              Container(
+                height: 35,
+                width: MediaQuery.of(context).size.width * 0.45,
+                decoration: BoxDecoration(
+                    color: Colors.purple,
+                    borderRadius: BorderRadius.circular(25)),
+                child: MaterialButton(
+                  onPressed: total == 0
+                      ? null
+                      : () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const PlaceOrderScreen()));
+                        },
+                  child: const Text(
+                    'CHECK OUT',
+                    style: TextStyle(color: Colors.white54, fontSize: 18),
+                  ),
+                ),
               ),
             ],
           ),

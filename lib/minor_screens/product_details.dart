@@ -167,11 +167,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               )),
                   ],
                 ),
-                Text(
-                  (widget.proList['instock'].toString()) +
-                      (' pieces available in stock'),
-                  style: const TextStyle(fontSize: 16, color: Colors.blueGrey),
-                ),
+                widget.proList['instock'] == 0
+                    ? const Text(
+                        'This Item is Out of Stock!!',
+                        style: TextStyle(fontSize: 16, color: Colors.blueGrey),
+                      )
+                    : Text(
+                        (widget.proList['instock'].toString()) +
+                            (' pieces available in stock'),
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.blueGrey),
+                      ),
                 const ProductDetailsHeaderLabel(
                   label: '  Item Description  ',
                 ),
@@ -290,10 +296,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ? 'Added to Cart'
                         : 'Add To Cart',
                     onPressed: () {
-                      existingItemCart != null
-                          ? MyMessageHandler.showSnackbar(
-                              _scafoldKey, 'this item is already in your cart')
-                          : context.read<Cart>().addItem(
+
+                      if(widget.proList['instock']==0){
+                        MyMessageHandler.showSnackbar(
+                              _scafoldKey, 'this item is out of stock');
+
+                      }else if(existingItemCart != null){
+                         MyMessageHandler.showSnackbar(
+                              _scafoldKey, 'this item is already in your cart');
+                      }else{
+                        context.read<Cart>().addItem(
                                 widget.proList['proname'],
                                 widget.proList['price'],
                                 1,
@@ -302,6 +314,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 widget.proList['proid'],
                                 widget.proList['sid'],
                               );
+                      }
                     },
                     width: 0.5)
               ],

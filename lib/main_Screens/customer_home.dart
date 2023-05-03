@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_store_app/main_Screens/cart.dart';
 import 'package:multi_store_app/main_Screens/category.dart';
 import 'package:multi_store_app/main_Screens/home.dart';
 import 'package:multi_store_app/main_Screens/profile.dart';
 import 'package:multi_store_app/main_Screens/stores.dart';
+import 'package:badges/badges.dart' as badges;
+import 'package:provider/provider.dart';
+
+import '../providers/cart_provider.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -21,7 +24,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     const CategoryScreen(),
     const StoresScreen(),
     const CartScreen(),
-    ProfileScreen(documentId: FirebaseAuth.instance.currentUser!.uid,),
+    ProfileScreen(
+      documentId: FirebaseAuth.instance.currentUser!.uid,
+    ),
   ];
   @override
   Widget build(BuildContext context) {
@@ -34,24 +39,34 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
         unselectedItemColor: Colors.purple,
         currentIndex: _selectedIndex,
-        items: const [
-          BottomNavigationBarItem(
+        items: [
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Category',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.shop),
             label: 'Stores',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            icon: badges.Badge(
+                showBadge: context.read<Cart>().getItems.isEmpty ? false : true,
+                badgeStyle: const badges.BadgeStyle(badgeColor: Colors.purple),
+                badgeContent: Text(
+                  context.watch<Cart>().getItems.length.toString(),
+                  style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600),
+                ),
+                child: const Icon(Icons.shopping_cart)),
             label: 'Cart',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
           ),
