@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 
 class FullScreenView extends StatefulWidget {
-  
   final List<dynamic> imagesList;
   const FullScreenView({super.key, required this.imagesList});
 
@@ -12,7 +10,7 @@ class FullScreenView extends StatefulWidget {
 }
 
 class _FullScreenViewState extends State<FullScreenView> {
-  int index =0;
+  int index = 0;
   final PageController _controller = PageController();
   @override
   Widget build(BuildContext context) {
@@ -27,20 +25,19 @@ class _FullScreenViewState extends State<FullScreenView> {
         children: [
           Center(
               child: Text(
-            ('${index +1}')+('/')+(widget.imagesList.length.toString()),
+            ('${index + 1}') + ('/') + (widget.imagesList.length.toString()),
             style: const TextStyle(fontSize: 24, letterSpacing: 8),
           )),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.5,
             child: PageView(
-              onPageChanged: (value){
-                setState(() {
-                  index = value;
-                });
-              },
-              controller: _controller,
-              children:images() 
-            ),
+                onPageChanged: (value) {
+                  setState(() {
+                    index = value;
+                  });
+                },
+                controller: _controller,
+                children: images()),
           ),
           SizedBox(
               height: MediaQuery.of(context).size.height * 0.2,
@@ -56,7 +53,7 @@ class _FullScreenViewState extends State<FullScreenView> {
         itemCount: widget.imagesList.length,
         itemBuilder: (context, index) {
           return GestureDetector(
-            onTap: (){
+            onTap: () {
               _controller.jumpToPage(index);
             },
             child: Container(
@@ -79,11 +76,11 @@ class _FullScreenViewState extends State<FullScreenView> {
         });
   }
 
-  List <Widget>images(){
+  List<Widget> images() {
     return List.generate(widget.imagesList.length, (index) {
-                return InteractiveViewer(
-                    transformationController: TransformationController(),
-                    child: Image.network(widget.imagesList[index].toString()));
-              });
+      return InteractiveViewer(
+          transformationController: TransformationController(),
+          child: Image.network(widget.imagesList[index].toString()));
+    });
   }
 }

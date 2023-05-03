@@ -99,8 +99,9 @@ class _CustomerRegisterScreenState extends State<SupplierRegisterScreen> {
             'coverpage': '',
             'sid': _uid,
           });
-
-          Navigator.pushReplacementNamed(context, '/supplierLogin_screen');
+          await Future.delayed(const Duration(microseconds: 100)).whenComplete(
+              () => Navigator.pushReplacementNamed(
+                  context, '/supplierLogin_screen'));
         } on FirebaseAuthException catch (e) {
           if (e.code == 'weak password') {
             setState(() {
@@ -287,7 +288,9 @@ class _CustomerRegisterScreenState extends State<SupplierRegisterScreen> {
                         },
                       ),
                       processing == true
-                          ? const CircularProgressIndicator(color: Colors.purple,)
+                          ? const CircularProgressIndicator(
+                              color: Colors.purple,
+                            )
                           : AuthMainButton(
                               mainButtonLabel: 'Sign Up',
                               onPressed: () {

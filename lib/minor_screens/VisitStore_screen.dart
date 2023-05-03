@@ -108,7 +108,7 @@ class _VisitStoreState extends State<VisitStore> {
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceAround,
-                                      children: [
+                                      children:const  [
                                         Text('Edit'),
                                         Icon(
                                           Icons.edit,

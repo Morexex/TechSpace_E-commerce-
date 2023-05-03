@@ -109,12 +109,15 @@ class CartModel extends StatelessWidget {
                                                                   product.documentId,
                                                                   product.suppId,
                                                                 );
-                                                        context
+                                                                await Future.delayed(const Duration(microseconds: 100)).whenComplete(() {
+                                                                  context
                                                             .read<
                                                                 Cart>()
                                                             .removeItem(
                                                                 product);
                                                                 Navigator.pop(context);
+                                                                });
+                                                        
                                                       },
                                                       child: const Text(
                                                           'Move to Wishlist'),

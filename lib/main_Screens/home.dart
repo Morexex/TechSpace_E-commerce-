@@ -1,10 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_store_app/gallery/bags_gallery.dart';
 import 'package:multi_store_app/gallery/beauty_gallery.dart';
 import 'package:multi_store_app/gallery/kids_gallery.dart';
-import 'package:multi_store_app/minor_screens/search_screen.dart';
-
 import '../gallery/accessories_gallery.dart';
 import '../gallery/electronics_gallery.dart';
 import '../gallery/homeGarden_gallery.dart';
@@ -51,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BagsGalleryScreen(),
           ElectronicGalleryScreen(),
           AccessoriesGalleryScreen(),
-          HomeandGardenGalleryScreen(),
+          HomeGarScreen(),
           KidsGalleryScreen(),
           BeautyGalleryScreen(),
         ]),

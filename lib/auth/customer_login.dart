@@ -30,6 +30,7 @@ class _CustomerRegisterScreenState extends State<CustomerLoginScreen> {
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
         _formKey.currentState!.reset();
+        // ignore: use_build_context_synchronously
         Navigator.pushReplacementNamed(context, '/customer_home');
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
@@ -74,7 +75,7 @@ class _CustomerRegisterScreenState extends State<CustomerLoginScreen> {
                       const AuthHeaderLabel(
                         headerLabel: 'Log In',
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 50,
                       ),
                       Padding(

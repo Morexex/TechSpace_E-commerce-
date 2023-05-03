@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../minor_screens/placeorder_screen.dart';
 import '../models/cart_model.dart';
 import '../providers/cart_provider.dart';
-import '../widgets/repeated_button_widget.dart';
+
 
 class CartScreen extends StatefulWidget {
   final Widget? back;

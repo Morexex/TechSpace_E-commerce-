@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 
@@ -32,8 +32,13 @@ class StoresScreen extends StatelessWidget {
                       crossAxisCount: 2),
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>VisitStore(suppId: snapshot.data!.docs[index]['sid'],)));
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => VisitStore(
+                                      suppId: snapshot.data!.docs[index]['sid'],
+                                    )));
                       },
                       child: Column(
                         children: [
@@ -45,14 +50,16 @@ class StoresScreen extends StatelessWidget {
                                 child: Image.asset('images/inapp/store.png'),
                               ),
                               Positioned(
-                                bottom: 28,
-                                left: 12,
+                                  bottom: 28,
+                                  left: 12,
                                   child: SizedBox(
-                                height: 48,
-                                width: 90,
-                                child: Image.network(
-                                    snapshot.data!.docs[index]['storelogo'],fit: BoxFit.cover,),
-                              ))
+                                    height: 48,
+                                    width: 90,
+                                    child: Image.network(
+                                      snapshot.data!.docs[index]['storelogo'],
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ))
                             ],
                           ),
                           Text(snapshot.data!.docs[index]['name'].toLowerCase(),

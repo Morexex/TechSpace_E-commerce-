@@ -302,13 +302,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   };
                                                 },
                                                 tabYes: () async {
-                                                  await FirebaseAuth
+                                                   FirebaseAuth
                                                       .instance.signOut;
-                                                  Navigator.pop(context);
+                                                      await Future.delayed(const Duration(microseconds: 100)).whenComplete(() {
+                                                        Navigator.pop(context);
                                                   Navigator
                                                       .pushReplacementNamed(
                                                           context,
                                                           '/welcome_screen');
+                                                      });
+                                                  
                                                 });
                                           },
                                         ),

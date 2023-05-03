@@ -135,7 +135,7 @@ class _PaymentScreen extends State<PaymentScreen> {
                                           fontSize: 16, color: Colors.grey),
                                     ),
                                     Text(
-                                      '1400' + (' Ksh'),
+                                      ('1400') + (' Ksh'),
                                       style: TextStyle(
                                           fontSize: 16, color: Colors.grey),
                                     ),
@@ -354,13 +354,16 @@ class _PaymentScreen extends State<PaymentScreen> {
                                                         });
                                                       });
                                                     }
-                                                    context
+                                                    await Future.delayed(const Duration()).whenComplete((){
+                                                      context
                                                         .read<Cart>()
                                                         .clearCart();
                                                     Navigator.popUntil(
                                                         context,
                                                         ModalRoute.withName(
                                                             '/customer_home'));
+                                                    });
+                                                    
                                                   },
                                                   width: 0.8)
                                             ],

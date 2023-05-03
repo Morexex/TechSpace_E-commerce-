@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:multi_store_app/categories/utilities/cat_list.dart';
-import 'package:multi_store_app/minor_screens/sub_categoryproduct.dart';
+
 
 import '../widgets/category_widgets.dart';
 

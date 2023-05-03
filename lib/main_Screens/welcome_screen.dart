@@ -253,8 +253,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 setState(() {
                                   processing = true;
                                 });
-                                Navigator.pushReplacementNamed(
-                                    context, '/customer_home');
+                                await Future.delayed(const Duration(microseconds: 100)).whenComplete(() =>Navigator.pushReplacementNamed(
+                                    context, '/customer_home') );
+                                
                               },
                               label: 'Guest',
                               child: const Icon(

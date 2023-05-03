@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
-import 'package:multi_store_app/widgets/repeated_button_widget.dart';
 
 class SupplierBalanceScreen extends StatelessWidget {
   const SupplierBalanceScreen({super.key});

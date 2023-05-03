@@ -10,7 +10,7 @@ import 'package:multi_store_app/widgets/appbar_widgets.dart';
 import '../minor_screens/VisitStore_screen.dart';
 import '../widgets/alert_dialogue.dart';
 
-List<String> Label = [
+List<String> label = [
   'My Store',
   'orders',
   'edit profile',
@@ -28,7 +28,9 @@ List<IconData> icons = [
 ];
 
 List<Widget> pages = [
-  VisitStore(suppId: FirebaseAuth.instance.currentUser!.uid,),
+  VisitStore(
+    suppId: FirebaseAuth.instance.currentUser!.uid,
+  ),
   const SupplierOrdersScreen(),
   const BusinessProfileScreen(),
   const ManageProductsScreen(),
@@ -61,7 +63,7 @@ class DashBoardScreen extends StatelessWidget {
                       };
                     },
                     tabYes: () async {
-                      await FirebaseAuth.instance.signOut;
+                      FirebaseAuth.instance.signOut;
                       Navigator.pop(context);
                       Navigator.pushReplacementNamed(
                           context, '/welcome_screen');
@@ -98,7 +100,7 @@ class DashBoardScreen extends StatelessWidget {
                       size: 50,
                     ),
                     Text(
-                      Label[index].toLowerCase(),
+                      label[index].toLowerCase(),
                       style: const TextStyle(
                           fontSize: 24,
                           color: Colors.purple,

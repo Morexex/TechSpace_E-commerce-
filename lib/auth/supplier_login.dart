@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../widgets/authentication_widgets.dart';
 import '../widgets/snackbar.dart';
 
-
 class SupplierLoginScreen extends StatefulWidget {
   const SupplierLoginScreen({super.key});
 
@@ -30,7 +29,8 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
         _formKey.currentState!.reset();
-        Navigator.pushReplacementNamed(context, '/supplier_home');
+        await Future.delayed(const Duration(microseconds: 100)).whenComplete(
+            () => Navigator.pushReplacementNamed(context, '/supplier_home'));
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           setState(() {
@@ -74,7 +74,7 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
                       const AuthHeaderLabel(
                         headerLabel: 'Log In',
                       ),
-                      const SizedBox  (
+                      const SizedBox(
                         height: 50,
                       ),
                       Padding(
@@ -133,7 +133,14 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
                           ),
                         ),
                       ),
-                      TextButton(onPressed: (){},child:const  Text('forgot password?',style: TextStyle(fontSize: 18,fontStyle: FontStyle.italic),),),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text(
+                          'forgot password?',
+                          style: TextStyle(
+                              fontSize: 18, fontStyle: FontStyle.italic),
+                        ),
+                      ),
                       HaveAccount(
                         haveAccount: 'Dont have an account? ',
                         actionLabel: 'Sign Up',
@@ -143,7 +150,9 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
                         },
                       ),
                       processing == true
-                          ? const CircularProgressIndicator(color: Colors.purple,)
+                          ? const CircularProgressIndicator(
+                              color: Colors.purple,
+                            )
                           : AuthMainButton(
                               mainButtonLabel: 'Log In',
                               onPressed: () {
