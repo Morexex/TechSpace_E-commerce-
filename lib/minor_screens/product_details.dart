@@ -35,6 +35,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late List<dynamic> imagesList = widget.proList['proimages'];
   @override
   Widget build(BuildContext context) {
+    var onSale = widget.proList['discount'];
     var existingItemCart = context.read<Cart>().getItems.firstWhereOrNull(
         (product) => product.documentId == widget.proList['proid']);
     return SafeArea(
@@ -110,19 +111,43 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   children: [
                     Row(
                       children: [
-                        const Text(
-                          'KSH ',
-                          style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          widget.proList['price'].toStringAsFixed(2),
-                          style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600),
+                        Row(
+                          children: [
+                            const Text(
+                              'Ksh ',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            Text(
+                              widget.proList['price'].toStringAsFixed(2),
+                              style: onSale != 0
+                                  ? const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 11,
+                                      decoration: TextDecoration.lineThrough,
+                                      fontWeight: FontWeight.w600)
+                                  : const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(
+                              width: 6,
+                            ),
+                            onSale != 0
+                                ? Text(
+                                    ((1 - (widget.proList['discount'] / 100)) *
+                                            widget.proList['price'])
+                                        .toStringAsFixed(2),
+                                    style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600),
+                                  )
+                                : const Text(''),
+                          ],
                         ),
                       ],
                     ),
@@ -140,7 +165,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   .removeThis(widget.proList['proid'])
                               : context.read<Wish>().addWishItem(
                                     widget.proList['proname'],
-                                    widget.proList['price'],
+                                    onSale != 0
+                                        ? ((1 -
+                                                (widget.proList['discount'] /
+                                                    100)) *
+                                            widget.proList['price'])
+                                        : widget.proList['price'],
                                     1,
                                     widget.proList['instock'],
                                     widget.proList['proimages'],
@@ -296,24 +326,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ? 'Added to Cart'
                         : 'Add To Cart',
                     onPressed: () {
-
-                      if(widget.proList['instock']==0){
+                      if (widget.proList['instock'] == 0) {
                         MyMessageHandler.showSnackbar(
-                              _scafoldKey, 'this item is out of stock');
-
-                      }else if(existingItemCart != null){
-                         MyMessageHandler.showSnackbar(
-                              _scafoldKey, 'this item is already in your cart');
-                      }else{
+                            _scafoldKey, 'this item is out of stock');
+                      } else if (existingItemCart != null) {
+                        MyMessageHandler.showSnackbar(
+                            _scafoldKey, 'this item is already in your cart');
+                      } else {
                         context.read<Cart>().addItem(
-                                widget.proList['proname'],
-                                widget.proList['price'],
-                                1,
-                                widget.proList['instock'],
-                                widget.proList['proimages'],
-                                widget.proList['proid'],
-                                widget.proList['sid'],
-                              );
+                              widget.proList['proname'],
+                              onSale != 0
+                                  ? ((1 - (widget.proList['discount'] / 100)) *
+                                      widget.proList['price'])
+                                  : widget.proList['price'],
+                              1,
+                              widget.proList['instock'],
+                              widget.proList['proimages'],
+                              widget.proList['proid'],
+                              widget.proList['sid'],
+                            );
                       }
                     },
                     width: 0.5)
