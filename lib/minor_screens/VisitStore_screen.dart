@@ -7,6 +7,7 @@ import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../models/product_model.dart';
+import 'edit_store.dart';
 
 class VisitStore extends StatefulWidget {
   final String suppId;
@@ -53,10 +54,10 @@ class _VisitStoreState extends State<VisitStore> {
             backgroundColor: Colors.blueGrey.shade100,
             appBar: AppBar(
               toolbarHeight: 100,
-              flexibleSpace: Image.asset(
+              flexibleSpace:data['coverpage']==''? Image.asset(
                 'images/inapp/coverimage.jpg',
                 fit: BoxFit.cover,
-              ),
+              ):Image.network(data['coverpage'],fit: BoxFit.cover,),
               leading: const YellowBackButton(),
               title: Row(
                 children: [
@@ -104,11 +105,17 @@ class _VisitStoreState extends State<VisitStore> {
                                         width: 3, color: Colors.black),
                                     borderRadius: BorderRadius.circular(25)),
                                 child: MaterialButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                   EditStore(data: data)));
+                                    },
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceAround,
-                                      children:const  [
+                                      children: const [
                                         Text('Edit'),
                                         Icon(
                                           Icons.edit,
@@ -200,7 +207,7 @@ class _VisitStoreState extends State<VisitStore> {
             ),
             floatingActionButton: FloatingActionButton(
                 backgroundColor: Colors.green,
-                child:const  Icon(
+                child: const Icon(
                   FontAwesomeIcons.whatsapp,
                   color: Colors.white,
                   size: 40,
