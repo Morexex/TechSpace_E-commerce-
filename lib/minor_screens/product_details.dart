@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:multi_store_app/main_Screens/cart.dart';
@@ -29,6 +30,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       .collection('products')
       .where('maincateg', isEqualTo: widget.proList['maincateg'])
       .where('subcateg', isEqualTo: widget.proList['subcateg'])
+      .snapshots();
+  late final Stream<QuerySnapshot> reviewsStream = FirebaseFirestore.instance
+      .collection('products')
+      .doc(widget.proList['proid'])
+      .collection('reviews')
       .snapshots();
   final GlobalKey<ScaffoldMessengerState> _scafoldKey =
       GlobalKey<ScaffoldMessengerState>();
@@ -220,6 +226,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     color: Colors.blueGrey.shade800,
                   ),
                 ),
+                Stack(
+                  children: [
+                    const Positioned(
+                      right: 50,
+                      top:15,
+                      child: Text('Total')),
+                    ExpandableTheme(
+                        data: const ExpandableThemeData(
+                          iconSize: 30,
+                          iconColor: Colors.blue,
+                        ),
+                        child: reviews(reviewsStream)),
+                  ],
+                ),
                 const ProductDetailsHeaderLabel(
                   label: '  Similar Item  ',
                 ),
@@ -398,4 +418,79 @@ class ProductDetailsHeaderLabel extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget reviews(var reviewsStream) {
+  return ExpandablePanel(
+      header: const Padding(
+        padding: EdgeInsets.all(10),
+        child: Text(
+          'Reviews',
+          style: TextStyle(
+              color: Colors.blue, fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      ),
+      collapsed: SizedBox(
+        height: 230,
+        child: reviewsAll(reviewsStream),
+      ),
+      expanded: reviewsAll(reviewsStream));
+}
+
+Widget reviewsAll(var reviewsStream) {
+  return StreamBuilder<QuerySnapshot>(
+    stream: reviewsStream,
+    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot2) {
+      if (snapshot2.connectionState == ConnectionState.waiting) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+
+      if (snapshot2.data!.docs.isEmpty) {
+        return const Center(
+          child: Text(
+            'No Reviews\n \n on this product yet!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 26,
+              color: Colors.blueGrey,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Acme',
+              letterSpacing: 1.5,
+            ),
+          ),
+        );
+      }
+
+      return ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: snapshot2.data!.docs.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: CircleAvatar(
+                backgroundImage:
+                    NetworkImage(snapshot2.data!.docs[index]['profileimage']),
+              ),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(snapshot2.data!.docs[index]['name']),
+                  Row(
+                    children: [
+                      Text(snapshot2.data!.docs[index]['rate'].toString()),
+                      const Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      )
+                    ],
+                  ),
+                ],
+              ),
+              subtitle: Text(snapshot2.data!.docs[index]['comment']),
+            );
+          });
+    },
+  );
 }

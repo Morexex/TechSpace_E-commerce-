@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 import 'package:multi_store_app/widgets/repeated_button_widget.dart';
+import 'package:multi_store_app/widgets/snackbar.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -18,6 +19,8 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreen extends State<PaymentScreen> {
+  final GlobalKey<ScaffoldMessengerState> _scafoldKey =
+      GlobalKey<ScaffoldMessengerState>();
   int selectedValue = 1;
   late String orderId;
   CollectionReference customers =
@@ -312,7 +315,7 @@ class _PaymentScreen extends State<PaymentScreen> {
                                                         'proid':
                                                             item.documentId,
                                                         'orderid': orderId,
-                                                        'odername':item.name,
+                                                        'odername': item.name,
                                                         'orderimage': item
                                                             .imagesUrl.first,
                                                         'orderqty': item.qty,
@@ -354,16 +357,17 @@ class _PaymentScreen extends State<PaymentScreen> {
                                                         });
                                                       });
                                                     }
-                                                    await Future.delayed(const Duration()).whenComplete((){
+                                                    await Future.delayed(
+                                                            const Duration())
+                                                        .whenComplete(() {
                                                       context
-                                                        .read<Cart>()
-                                                        .clearCart();
-                                                    Navigator.popUntil(
-                                                        context,
-                                                        ModalRoute.withName(
-                                                            '/customer_home'));
+                                                          .read<Cart>()
+                                                          .clearCart();
+                                                      Navigator.popUntil(
+                                                          context,
+                                                          ModalRoute.withName(
+                                                              '/customer_home'));
                                                     });
-                                                    
                                                   },
                                                   width: 0.8)
                                             ],
@@ -371,11 +375,65 @@ class _PaymentScreen extends State<PaymentScreen> {
                                         ),
                                       ));
                             } else if (selectedValue == 2) {
-                              print("Visa");
+                              showModalBottomSheet(
+                                context: context,
+                                builder: ((context) => SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.3,
+                                      child: const Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Developing in progress!!',
+                                            style: TextStyle(
+                                                fontSize: 35,
+                                                color: Colors.purple),
+                                          ),
+                                        ),
+                                      ),
+                                    )),
+                              );
                             } else if (selectedValue == 3) {
-                              print("paypal");
+                              showModalBottomSheet(
+                                context: context,
+                                builder: ((context) => SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.3,
+                                      child: const Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Developing in progress!!',
+                                            style: TextStyle(
+                                                fontSize: 35,
+                                                color: Colors.purple),
+                                          ),
+                                        ),
+                                      ),
+                                    )),
+                              );
                             } else if (selectedValue == 4) {
-                              print("Mpesa");
+                              showModalBottomSheet(
+                                context: context,
+                                builder: ((context) => SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.3,
+                                      child: const Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Developing in progress!!',
+                                            style: TextStyle(
+                                                fontSize: 35,
+                                                color: Colors.purple),
+                                          ),
+                                        ),
+                                      ),
+                                    )),
+                              );
                             }
                           },
                           width: 1),

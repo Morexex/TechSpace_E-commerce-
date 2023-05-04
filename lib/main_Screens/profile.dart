@@ -45,10 +45,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             body: Stack(
               children: [
                 Container(
-                  height: 180,
+                  height: 240,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.yellow, Colors.black54],
+                      colors: [Colors.yellow, Colors.black45],
                     ),
                   ),
                 ),
@@ -59,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       pinned: true,
                       elevation: 0,
                       backgroundColor: Colors.white,
-                      expandedHeight: 120,
+                      expandedHeight: 150,
                       flexibleSpace:
                           LayoutBuilder(builder: (context, constraints) {
                         return FlexibleSpaceBar(
@@ -91,14 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     backgroundImage:
                                         NetworkImage(data['profileimage']),
                                   ),
-                                  /* const Padding(
-                              padding: EdgeInsets.only(top: 25, left: 30),
-                              child: CircleAvatar(
-                                radius: 50,
-                                backgroundImage:
-                                    AssetImage('images/inapp/guest.jpg'),
-                              ),
-                                                      ), */
+                                  
                                   Padding(
                                     padding: const EdgeInsets.only(left: 25),
                                     child: Text(
@@ -121,11 +114,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         children: [
                           Container(
-                            height: 60,
+                            height: 70,
                             width: MediaQuery.of(context).size.width * 0.9,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(50),
+                              borderRadius: BorderRadius.circular(30),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -138,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           bottomLeft: Radius.circular(30))),
                                   child: TextButton(
                                     child: SizedBox(
-                                      height: 65,
+                                      height: 37,
                                       width: MediaQuery.of(context).size.width *
                                           0.2,
                                       child: const Center(
@@ -165,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: Colors.purple,
                                   child: TextButton(
                                     child: SizedBox(
-                                      height: 65,
+                                      height: 37,
                                       width: MediaQuery.of(context).size.width *
                                           0.2,
                                       child: const Center(
@@ -194,7 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           bottomRight: Radius.circular(30))),
                                   child: TextButton(
                                     child: SizedBox(
-                                      height: 65,
+                                      height: 37,
                                       width: MediaQuery.of(context).size.width *
                                           0.2,
                                       child: const Center(
