@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 import 'package:multi_store_app/widgets/repeated_button_widget.dart';
-import 'package:multi_store_app/widgets/snackbar.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:sn_progress_dialog/sn_progress_dialog.dart';
@@ -12,7 +11,10 @@ import 'package:sn_progress_dialog/sn_progress_dialog.dart';
 import '../providers/cart_provider.dart';
 
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+  final String name;
+  final String phone;
+  final String address;
+  const PaymentScreen({super.key, required this.name, required this.phone, required this.address});
 
   @override
   State<PaymentScreen> createState() => _PaymentScreen();
@@ -304,11 +306,11 @@ class _PaymentScreen extends State<PaymentScreen> {
                                                           .set({
                                                         'cid': data['cid'],
                                                         'custname':
-                                                            data['name'],
+                                                            widget.name,
                                                         'email': data['email'],
                                                         'address':
-                                                            data['address'],
-                                                        'phone': data['phone'],
+                                                            widget.address,
+                                                        'phone':widget.phone,
                                                         'profileimage': data[
                                                             'profileimage'],
                                                         'sid': item.suppId,

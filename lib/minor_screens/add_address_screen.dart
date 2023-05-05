@@ -1,0 +1,194 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:multi_store_app/widgets/appbar_widgets.dart';
+import 'package:multi_store_app/widgets/repeated_button_widget.dart';
+import 'package:country_state_city_picker/country_state_city_picker.dart';
+import 'package:multi_store_app/widgets/snackbar.dart';
+import 'package:uuid/uuid.dart';
+
+class AddAddress extends StatefulWidget {
+  const AddAddress({super.key});
+
+  @override
+  State<AddAddress> createState() => _AddAddressState();
+}
+
+class _AddAddressState extends State<AddAddress> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldMessengerState> _scafoldKey =
+      GlobalKey<ScaffoldMessengerState>();
+  late String firstName;
+  late String lastName;
+  late String phone;
+  String countryValue = 'Choose Country';
+  String stateValue = 'Choose City';
+  String cityValue = 'Choose Town';
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: ScaffoldMessenger(
+        key: _scafoldKey,
+        child: Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            leading: const AppBarBackButton(),
+            title: const AppBarTitle(title: 'Add Address'),
+          ),
+          body: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 40, 30, 40),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please Enter Your First Name';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            firstName = value!;
+                          },
+                          decoration: textFormDecoration.copyWith(
+                            labelText: 'First Name',
+                            hintText: 'Enter First Name',
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please Enter Your Last Name';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            lastName = value!;
+                          },
+                          decoration: textFormDecoration.copyWith(
+                            labelText: 'Last Name',
+                            hintText: 'Enter Last Name',
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        child: TextFormField(
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please Enter Your Phone Number';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            phone = value!;
+                          },
+                          decoration: textFormDecoration.copyWith(
+                            labelText: 'Phone',
+                            hintText: 'Enter Phone Number',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SelectState(
+                    // style: TextStyle(color: Colors.red),
+                    onCountryChanged: (value) {
+                  setState(() {
+                    countryValue = value;
+                  });
+                }, onStateChanged: (value) {
+                  setState(() {
+                    stateValue = value;
+                  });
+                }, onCityChanged: (value) {
+                  setState(() {
+                    cityValue = value;
+                  });
+                }),
+                const SizedBox(
+                  height: 100,
+                ),
+                Center(
+                  child: RepeatedButton(
+                      label: 'Add New Address',
+                      onPressed: () async {
+                        if (formKey.currentState!.validate()) {
+                          if (countryValue != 'Choose Country' &&
+                              stateValue != 'Choose City' &&
+                              cityValue != 'Choose Town') {
+                            formKey.currentState!.save();
+
+                           CollectionReference addressReference = FirebaseFirestore.instance
+                                .collection('customers')
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                .collection('address');
+                                var addressId =const  Uuid().v4();
+                                await addressReference.doc(addressId).set({
+                                  'addressid': addressId,
+                                  'fname':firstName,
+                                  'lname':lastName,
+                                  'phone':phone,
+                                  'country':countryValue,
+                                  'state':stateValue,
+                                  'city':cityValue,
+                                  'default':true,
+
+
+                                }).whenComplete(() => Navigator.pop(context));
+                          } else {
+                            MyMessageHandler.showSnackbar(
+                                _scafoldKey, 'please set your location');
+                          }
+                        } else {
+                          MyMessageHandler.showSnackbar(
+                              _scafoldKey, 'please fill all fields');
+                        }
+                      },
+                      width: 0.8),
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+var textFormDecoration = InputDecoration(
+  labelText: 'price',
+  hintText: 'price..ksh',
+  labelStyle: const TextStyle(color: Colors.black),
+  border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
+  enabledBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.purple, width: 1),
+      borderRadius: BorderRadius.circular(25)),
+  focusedBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.blueAccent, width: 1),
+      borderRadius: BorderRadius.circular(25)),
+);
+
+extension QuantityValidator on String {
+  bool isValidQuantity() {
+    return RegExp(r'^[1-9][0-9]*$').hasMatch(this);
+  }
+}

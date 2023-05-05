@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_store_app/customer_screens/address_book.dart';
 import 'package:multi_store_app/customer_screens/customer_orders.dart';
 import 'package:multi_store_app/customer_screens/wishlist.dart';
 import 'package:multi_store_app/main_Screens/cart.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 
+import '../minor_screens/add_address_screen.dart';
 import '../widgets/alert_dialogue.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -19,12 +21,14 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   CollectionReference customers =
       FirebaseFirestore.instance.collection('customers');
-      CollectionReference anonymous=
+  CollectionReference anonymous =
       FirebaseFirestore.instance.collection('anonymous');
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseAuth.instance.currentUser!.isAnonymous?anonymous.doc(widget.documentId).get() :customers.doc(widget.documentId).get(),
+      future: FirebaseAuth.instance.currentUser!.isAnonymous
+          ? anonymous.doc(widget.documentId).get()
+          : customers.doc(widget.documentId).get(),
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -48,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 240,
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.yellow, Colors.black45],
+                      colors: [Colors.purple, Colors.black45],
                     ),
                   ),
                 ),
@@ -74,24 +78,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           background: Container(
                             decoration: const BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [Colors.yellow, Colors.black54],
+                                colors: [Colors.purple, Colors.black54],
                               ),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.only(top: 25, left: 30),
                               child: Row(
                                 children: [
-                                  data['profileimage'] == ''? const CircleAvatar(
-                                    radius: 50,
-                                    backgroundImage:
-                                        AssetImage('images/inapp/guest.jpg'),
-                                  ):
-                                  CircleAvatar(
-                                    radius: 50,
-                                    backgroundImage:
-                                        NetworkImage(data['profileimage']),
-                                  ),
-                                  
+                                  data['profileimage'] == ''
+                                      ? const CircleAvatar(
+                                          radius: 50,
+                                          backgroundImage: AssetImage(
+                                              'images/inapp/guest.jpg'),
+                                        )
+                                      : CircleAvatar(
+                                          radius: 50,
+                                          backgroundImage: NetworkImage(
+                                              data['profileimage']),
+                                        ),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 25),
                                     child: Text(
@@ -100,7 +104,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           : data['name'].toUpperCase(),
                                       style: const TextStyle(
                                           fontSize: 24,
-                                          fontWeight: FontWeight.w600),
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white),
                                     ),
                                   )
                                 ],
@@ -138,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         child: Text(
                                           ' Cart',
                                           style: TextStyle(
-                                              color: Colors.purple,
+                                              color: Colors.yellow,
                                               fontSize: 24),
                                         ),
                                       ),
@@ -165,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         child: Text(
                                           ' Orders',
                                           style: TextStyle(
-                                              color: Colors.black54,
+                                              color: Colors.white,
                                               fontSize: 20),
                                         ),
                                       ),
@@ -194,7 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         child: Text(
                                           ' WishList',
                                           style: TextStyle(
-                                              color: Colors.purple,
+                                              color: Colors.yellow,
                                               fontSize: 20),
                                         ),
                                       ),
@@ -236,19 +241,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       children: [
                                         RepeatedListTile(
                                           title: 'Email Address',
-                                          subTitle:data['email']==''? 'emaple@gmail.com': data['email'],
+                                          subTitle: data['email'] == ''
+                                              ? 'emaple@gmail.com'
+                                              : data['email'],
                                           icon: Icons.email,
                                         ),
                                         const PurpleDivider(),
                                         RepeatedListTile(
                                           title: 'Phone Number',
-                                          subTitle:data['phone']==''? 'example+2547xxxxxxxx': data['phone'],
+                                          subTitle: data['phone'] == ''
+                                              ? 'example+2547xxxxxxxx'
+                                              : data['phone'],
                                           icon: Icons.phone,
                                         ),
                                         const PurpleDivider(),
                                         RepeatedListTile(
+                                          onPressed: FirebaseAuth.instance
+                                                  .currentUser!.isAnonymous
+                                              ? null
+                                              : () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const AddressBook()));
+                                                },
                                           title: 'Address',
-                                          subTitle: data['address']==''? 'example@kangaru-Embu': data['address'],
+                                          subTitle: userAddress(data),
+                                          /* data['address']==''? 'example@kangaru-Embu': data['address'] */
                                           icon: Icons.location_pin,
                                         ),
                                       ],
@@ -295,16 +315,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   };
                                                 },
                                                 tabYes: () async {
-                                                   FirebaseAuth
-                                                      .instance.signOut;
-                                                      await Future.delayed(const Duration(microseconds: 100)).whenComplete(() {
-                                                        Navigator.pop(context);
-                                                  Navigator
-                                                      .pushReplacementNamed(
-                                                          context,
-                                                          '/welcome_screen');
-                                                      });
-                                                  
+                                                  FirebaseAuth.instance.signOut;
+                                                  await Future.delayed(
+                                                          const Duration(
+                                                              microseconds:
+                                                                  100))
+                                                      .whenComplete(() {
+                                                    Navigator.pop(context);
+                                                    Navigator
+                                                        .pushReplacementNamed(
+                                                            context,
+                                                            '/welcome_screen');
+                                                  });
                                                 });
                                           },
                                         ),
@@ -333,6 +355,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
   }
+}
+
+String userAddress(dynamic data) {
+  if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+    return 'Example: Embu-Kangaru';
+  } else if (FirebaseAuth.instance.currentUser!.isAnonymous == false &&
+      data['address'] == '') {
+    return 'Set Your Address';
+  }
+  return data['address'];
 }
 
 class PurpleDivider extends StatelessWidget {
