@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
+import '../minor_screens/edit_productScreen.dart';
 import '../minor_screens/product_details.dart';
 import '../providers/wish_provider.dart';
 
@@ -113,7 +114,13 @@ class _ProductModelState extends State<ProductModel> {
                             widget.products['sid'] ==
                                     FirebaseAuth.instance.currentUser!.uid
                                 ? IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EditProduct(items: widget.products,)));
+                                    },
                                     icon: const Icon(Icons.edit,
                                         color: Colors.red))
                                 : IconButton(
@@ -130,11 +137,13 @@ class _ProductModelState extends State<ProductModel> {
                                           : context.read<Wish>().addWishItem(
                                                 widget.products['proname'],
                                                 onSale != 0
-                                        ? ((1 -
-                                                (widget.products['discount'] /
-                                                    100)) *
-                                            widget.products['price'])
-                                        : widget.products['price'],
+                                                    ? ((1 -
+                                                            (widget.products[
+                                                                    'discount'] /
+                                                                100)) *
+                                                        widget
+                                                            .products['price'])
+                                                    : widget.products['price'],
                                                 1,
                                                 widget.products['instock'],
                                                 widget.products['proimages'],
