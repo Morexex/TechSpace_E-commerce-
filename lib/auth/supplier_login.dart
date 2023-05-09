@@ -1,6 +1,8 @@
 // ignore_for_file: avoid_print
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_store_app/providers/auth_repo.dart';
+import 'package:multi_store_app/widgets/repeated_button_widget.dart';
 import '../widgets/authentication_widgets.dart';
 import '../widgets/snackbar.dart';
 
@@ -19,6 +21,7 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
       GlobalKey<ScaffoldMessengerState>();
   bool passwordVisible = true;
   bool processing = false;
+  bool sendEmailVerification = false;
 
   void logIn() async {
     setState(() {
@@ -26,25 +29,26 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
     });
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: email, password: password);
-        _formKey.currentState!.reset();
-        await Future.delayed(const Duration(microseconds: 100)).whenComplete(
-            () => Navigator.pushReplacementNamed(context, '/supplier_home'));
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
+       await  AuthRepo.signInWithEmailAndPassword(email, password);
+
+        await AuthRepo.reloadUserData();
+        if (await AuthRepo.checkEmailVerification()) {
+          _formKey.currentState!.reset();
+          await Future.delayed(const Duration(microseconds: 100)).whenComplete(
+              () => Navigator.pushReplacementNamed(context, '/supplier_home'));
+        } else {
+          MyMessageHandler.showSnackbar(
+              _scafoldKey, 'Please check your email to verify');
           setState(() {
             processing = false;
+            sendEmailVerification = true;
           });
-          MyMessageHandler.showSnackbar(
-              _scafoldKey, 'No User found on that Email!');
-        } else if (e.code == 'wrong-password') {
-          setState(() {
-            processing = false;
-          });
-          MyMessageHandler.showSnackbar(
-              _scafoldKey, 'Wrong Password Try Again!');
         }
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          processing = false;
+        });
+        MyMessageHandler.showSnackbar(_scafoldKey, e.message.toString());
       }
     } else {
       setState(() {
@@ -74,8 +78,29 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
                       const AuthHeaderLabel(
                         headerLabel: 'Log In',
                       ),
-                      const SizedBox(
+                      SizedBox(
                         height: 50,
+                        child: sendEmailVerification == true
+                            ? RepeatedButton(
+                                label: 'Resend Email Verifification',
+                                onPressed: () async {
+                                  try {
+                                    await FirebaseAuth.instance.currentUser!
+                                        .sendEmailVerification();
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                  Future.delayed(const Duration(seconds: 3))
+                                      .whenComplete(
+                                    () {
+                                      setState(() {
+                                        sendEmailVerification = false;
+                                      });
+                                    },
+                                  );
+                                },
+                                width: 0.6)
+                            : const SizedBox(),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -93,7 +118,7 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
                           onChanged: (value) {
                             email = value;
                           },
-                          //controller: _emailController,
+                         
                           keyboardType: TextInputType.emailAddress,
                           decoration: textFormDecoration.copyWith(
                             labelText: 'Email Address',
@@ -113,7 +138,7 @@ class _CustomerRegisterScreenState extends State<SupplierLoginScreen> {
                           onChanged: (value) {
                             password = value;
                           },
-                          //controller: _passwordController,
+                          
                           obscureText: passwordVisible,
                           decoration: textFormDecoration.copyWith(
                             suffixIcon: IconButton(

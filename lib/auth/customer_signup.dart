@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../providers/auth_repo.dart';
 import '../widgets/authentication_widgets.dart';
 import '../widgets/snackbar.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -79,17 +80,21 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
     if (_formKey.currentState!.validate()) {
       if (_imageFile != null) {
         try {
-          await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(email: email, password: password);
+          await AuthRepo.signUpWithEmailAndPassword(email, password);
+
+          AuthRepo.sendEmailVerification();
 
           firebase_storage.Reference ref = firebase_storage
               .FirebaseStorage.instance
               .ref('cust-images/$email.jpg');
 
           await ref.putFile(File(_imageFile!.path));
-          _uid = FirebaseAuth.instance.currentUser!.uid;
+          _uid = AuthRepo.uid;
 
           profileImage = await ref.getDownloadURL();
+
+          AuthRepo.updateUserName(name);
+          AuthRepo.updateProfileImage(profileImage);
           await customers.doc(_uid).set({
             'name': name,
             'email': email,
@@ -102,19 +107,10 @@ class _CustomerRegisterScreenState extends State<CustomerRegisterScreen> {
               () => Navigator.pushReplacementNamed(
                   context, '/customerLogin_screen'));
         } on FirebaseAuthException catch (e) {
-          if (e.code == 'weak password') {
-            setState(() {
-              processing = false;
-            });
-            MyMessageHandler.showSnackbar(
-                _scafoldKey, 'The password provided is too weak!');
-          } else if (e.code == 'email-already-in-use') {
-            setState(() {
-              processing = false;
-            });
-            MyMessageHandler.showSnackbar(
-                _scafoldKey, 'The account already exists for that email!');
-          }
+          setState(() {
+            processing = false;
+          });
+          MyMessageHandler.showSnackbar(_scafoldKey, e.message.toString());
         }
       } else {
         setState(() {

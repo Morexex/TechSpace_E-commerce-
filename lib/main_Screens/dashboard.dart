@@ -5,6 +5,7 @@ import 'package:multi_store_app/dashboard_components/edit_business.dart';
 import 'package:multi_store_app/dashboard_components/manage_products.dart';
 import 'package:multi_store_app/dashboard_components/supplier_orders.dart';
 import 'package:multi_store_app/dashboard_components/supplier_statics.dart';
+import 'package:multi_store_app/providers/auth_repo.dart';
 import 'package:multi_store_app/widgets/appbar_widgets.dart';
 
 import '../minor_screens/VisitStore_screen.dart';
@@ -63,10 +64,13 @@ class DashBoardScreen extends StatelessWidget {
                       };
                     },
                     tabYes: () async {
-                      FirebaseAuth.instance.signOut;
-                      Navigator.pop(context);
-                      Navigator.pushReplacementNamed(
-                          context, '/welcome_screen');
+                      await AuthRepo.logOut();
+                      await Future.delayed(const Duration(microseconds: 100))
+                          .whenComplete(() {
+                        Navigator.pop(context);
+                        Navigator.pushReplacementNamed(
+                            context, '/welcome_screen');
+                      });
                     });
               },
               icon: const Icon(

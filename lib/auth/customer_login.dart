@@ -1,9 +1,16 @@
 // ignore_for_file: avoid_print
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:multi_store_app/main_Screens/forgot_password.dart';
+import '../providers/auth_repo.dart';
 import '../widgets/authentication_widgets.dart';
+import '../widgets/google_signIn_button.dart';
+import '../widgets/repeated_button_widget.dart';
 import '../widgets/snackbar.dart';
-
 
 class CustomerLoginScreen extends StatefulWidget {
   const CustomerLoginScreen({super.key});
@@ -13,6 +20,55 @@ class CustomerLoginScreen extends StatefulWidget {
 }
 
 class _CustomerRegisterScreenState extends State<CustomerLoginScreen> {
+  CollectionReference customers =
+      FirebaseFirestore.instance.collection("customers");
+
+  Future<bool> checkIfDocumentExists(String docId) async {
+    try {
+      var doc = await customers.doc(docId).get();
+      return doc.exists;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  bool docExists = false;
+
+  Future<UserCredential> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+    return await FirebaseAuth.instance
+        .signInWithCredential(credential)
+        .whenComplete(() async {
+      User user = FirebaseAuth.instance.currentUser!;
+      print(googleUser!.id);
+      print(FirebaseAuth.instance.currentUser!.uid);
+      print(googleUser);
+
+      docExists = await checkIfDocumentExists(user.uid);
+
+      docExists == false
+          ? await customers.doc(user.uid).set({
+              'name': user.displayName,
+              'email': user.email,
+              'profileimage': user.photoURL,
+              'phone': '',
+              'address': '',
+              'cid': user.uid,
+            }).then((value) => navigate())
+          : navigate();
+    });
+  }
+
+  void navigate() {
+    Navigator.pushReplacementNamed(context, '/customer_home');
+  }
+
   late String email;
   late String password;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -20,6 +76,7 @@ class _CustomerRegisterScreenState extends State<CustomerLoginScreen> {
       GlobalKey<ScaffoldMessengerState>();
   bool passwordVisible = true;
   bool processing = false;
+  bool sendEmailVerification = false;
 
   void logIn() async {
     setState(() {
@@ -27,25 +84,26 @@ class _CustomerRegisterScreenState extends State<CustomerLoginScreen> {
     });
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: email, password: password);
-        _formKey.currentState!.reset();
-        // ignore: use_build_context_synchronously
-        Navigator.pushReplacementNamed(context, '/customer_home');
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
+        await AuthRepo.signInWithEmailAndPassword(email, password);
+
+        await AuthRepo.reloadUserData();
+        if (await AuthRepo.checkEmailVerification()) {
+          _formKey.currentState!.reset();
+          await Future.delayed(const Duration(microseconds: 100)).whenComplete(
+              () => Navigator.pushReplacementNamed(context, '/customer_home'));
+        } else {
+          MyMessageHandler.showSnackbar(
+              _scafoldKey, 'Please check your email to verify');
           setState(() {
             processing = false;
+            sendEmailVerification = true;
           });
-          MyMessageHandler.showSnackbar(
-              _scafoldKey, 'No User found on that Email!');
-        } else if (e.code == 'wrong-password') {
-          setState(() {
-            processing = false;
-          });
-          MyMessageHandler.showSnackbar(
-              _scafoldKey, 'Wrong Password Try Again!');
         }
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          processing = false;
+        });
+        MyMessageHandler.showSnackbar(_scafoldKey, e.message.toString());
       }
     } else {
       setState(() {
@@ -75,8 +133,29 @@ class _CustomerRegisterScreenState extends State<CustomerLoginScreen> {
                       const AuthHeaderLabel(
                         headerLabel: 'Log In',
                       ),
-                      const SizedBox(
+                      SizedBox(
                         height: 50,
+                        child: sendEmailVerification == true
+                            ? RepeatedButton(
+                                label: 'Resend Email Verifification',
+                                onPressed: () async {
+                                  try {
+                                    await FirebaseAuth.instance.currentUser!
+                                        .sendEmailVerification();
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                  Future.delayed(const Duration(seconds: 3))
+                                      .whenComplete(
+                                    () {
+                                      setState(() {
+                                        sendEmailVerification = false;
+                                      });
+                                    },
+                                  );
+                                },
+                                width: 0.6)
+                            : const SizedBox(),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -134,7 +213,20 @@ class _CustomerRegisterScreenState extends State<CustomerLoginScreen> {
                           ),
                         ),
                       ),
-                      TextButton(onPressed: (){},child:const  Text('forgot password?',style: TextStyle(fontSize: 18,fontStyle: FontStyle.italic),),),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ForgotPassword()));
+                        },
+                        child: const Text(
+                          'forgot password?',
+                          style: TextStyle(
+                              fontSize: 18, fontStyle: FontStyle.italic),
+                        ),
+                      ),
                       HaveAccount(
                         haveAccount: 'Dont have an account? ',
                         actionLabel: 'Sign Up',
@@ -144,13 +236,21 @@ class _CustomerRegisterScreenState extends State<CustomerLoginScreen> {
                         },
                       ),
                       processing == true
-                          ? const CircularProgressIndicator(color: Colors.purple,)
+                          ? const CircularProgressIndicator(
+                              color: Colors.purple,
+                            )
                           : AuthMainButton(
                               mainButtonLabel: 'Log In',
                               onPressed: () {
                                 logIn();
                               },
                             ),
+                      divider(),
+                      GoogleLogInButton(
+                        onPressed: () {
+                          signInWithGoogle();
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -161,4 +261,30 @@ class _CustomerRegisterScreenState extends State<CustomerLoginScreen> {
       ),
     );
   }
+}
+
+Widget divider() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 30),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const [
+        SizedBox(
+          width: 80,
+          child: Divider(
+            color: Colors.grey,
+            thickness: 1,
+          ),
+        ),
+        Text(' or ', style: TextStyle(color: Colors.grey)),
+        SizedBox(
+          width: 80,
+          child: Divider(
+            color: Colors.grey,
+            thickness: 1,
+          ),
+        )
+      ],
+    ),
+  );
 }
